@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#181721">
+<title>Çizik — Hesap Aç</title>
+<style>
+  /* ---- Çizik Yeni Marka (2026-09-07, onaylı) ----
+     Palet: Arka plan #181721 · Öncelik #0F4D95 · Metin #E6EAEF · font: Arial
+     Facebook klasik kayıt düzeni: üst şeritte mini giriş, sağda kayıt/giriş kartı,
+     sol alan şimdilik boş (şekiller sonradan gelecek). */
+  @font-face{
+    font-family:'Arial';
+    src:url('fontlar/ARIAL.TTF') format('truetype');
+    font-weight:400; font-style:normal; font-display:swap;
+  }
+  @font-face{
+    font-family:'Arial';
+    src:url('fontlar/ARIALBD.TTF') format('truetype');
+    font-weight:700; font-style:normal; font-display:swap;
+  }
+  :root{
+    --bg:#181721; --pri:#0F4D95; --pri-hover:#0d417c;
+    --text:#E6EAEF; --muted:#8b93a1; --field:#24232f; --field-line:#3a3947;
+    --card:#1f1e2a; --line:#2e2d3a; --err:#e5533c; --ok:#3ba55d;
+  }
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:'Arial', Helvetica, sans-serif;
+    min-height:100vh; min-height:100dvh;
+  }
+
+  /* ===== üst bar ===== */
+  .topbar{ background:var(--pri); padding:14px 0; }
+  .topbar-in{
+    max-width:980px; margin:0 auto; padding:0 20px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  }
+  .wordmark{
+    font-size:34px; font-weight:700; letter-spacing:.5px; color:var(--text);
+    text-decoration:line-through; text-decoration-thickness:3.5px;
+    text-decoration-color:rgba(230,234,239,.75);
+  }
+  .mini-giris{display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;}
+  .mini-giris label{display:block; font-size:11.5px; margin-bottom:4px; color:rgba(230,234,239,.85);}
+  .mini-giris input{
+    display:block; width:170px; padding:7px 9px; font-size:14px; font-family:inherit;
+    background:#fff; color:#111; border:1px solid #1c2f47; border-radius:5px; outline:none;
+  }
+  .mini-giris input:focus{border-color:#7fb1e8;}
+  .mini-giris .btn-gir{
+    background:var(--pri-hover); color:var(--text); border:1px solid rgba(230,234,239,.35);
+    padding:8px 14px; font-size:14px; font-weight:700; font-family:inherit;
+    border-radius:5px; cursor:pointer;
+  }
+  .mini-giris .btn-gir:hover{background:#0b3768;}
+  .mg-row{display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;}
+  .sifre-unuttum{font-size:11.5px; margin-top:3px; text-align:right;}
+  .sifre-unuttum a{color:rgba(230,234,239,.75); text-decoration:none;}
+  .sifre-unuttum a:hover{text-decoration:underline;}
+
+  /* ===== ana bölüm ===== */
+  .main{
+    max-width:980px; margin:0 auto; padding:44px 20px 60px;
+    display:flex; gap:40px; align-items:flex-start;
+  }
+  .sol{flex:1 1 55%; min-height:420px;}
+  .sag{flex:1 1 45%; max-width:400px;}
+
+  .sag h1{font-size:30px; font-weight:700; margin-bottom:6px;}
+  .sag .alt-yazi{font-size:15.5px; color:var(--muted); margin-bottom:20px;}
+
+  .kart{
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:22px 20px; box-shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  .kart label{display:block; font-size:12.5px; color:var(--muted); margin:0 0 5px 2px;}
+  .kart input{
+    width:100%; padding:12px 13px; font-size:15.5px; font-family:inherit;
+    background:var(--field); color:var(--text);
+    border:1px solid var(--field-line); border-radius:8px; outline:none;
+    transition:border-color .15s;
+  }
+  .kart input:focus{border-color:var(--pri);}
+  .kart input::placeholder{color:#6a7180;}
+  .isim-satir{display:flex; gap:10px; margin-bottom:14px;}
+  .isim-satir > div{flex:1;}
+  .kart .alan{margin-bottom:14px;}
+  .ikonlu{position:relative;}
+  .ikonlu input{padding-right:38px;}
+  .ikonlu .x{
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    background:none; border:none; color:var(--muted); font-size:15px; cursor:pointer; display:none;
+  }
+  .ikonlu.dolu .x{display:block;}
+  .hata{font-size:12.5px; color:var(--err); margin-top:5px; display:none;}
+  .alan.hatali input{border-color:var(--err);}
+  .alan.hatali .hata{display:block;}
+  .hata-genel{
+    display:none; font-size:13px; color:var(--err);
+    background:rgba(229,83,60,.08); border:1px solid rgba(229,83,60,.35);
+    border-radius:8px; padding:9px 12px; margin-bottom:14px; line-height:1.45;
+  }
+
+  .cinsiyet{display:flex; gap:18px; margin:4px 0 16px;}
+  .cinsiyet label{display:flex; align-items:center; gap:7px; font-size:14.5px; color:var(--text); margin:0; cursor:pointer;}
+  .cinsiyet input{width:auto; accent-color:var(--pri);}
+
+  .sozlesme{font-size:12px; color:var(--muted); line-height:1.55; margin-bottom:18px;}
+  .sozlesme b{color:var(--text); font-weight:700;}
+
+  .btn-kayit{
+    display:block; width:100%;
+    background:var(--pri); color:var(--text);
+    border:none; border-radius:8px; padding:13px;
+    font-size:17px; font-weight:700; font-family:inherit; letter-spacing:.3px;
+    cursor:pointer; transition:background .15s;
+  }
+  .btn-kayit:hover{background:var(--pri-hover);}
+
+  .giris-link{margin-top:16px; text-align:center; font-size:14px; color:var(--muted);}
+  .giris-link a{color:var(--text); font-weight:700; text-decoration:none; cursor:pointer;}
+  .giris-link a:hover{text-decoration:underline;}
+
+  .uyari-ok{ font-size:13px; color:var(--ok); margin-top:12px; text-align:center; display:none; }
+
+  @media (max-width:760px){
+    .topbar-in{justify-content:center;}
+    .mini-giris{display:none;}
+    .main{flex-direction:column; padding-top:26px;}
+    .sol{display:none; min-height:0;}
+    .sag{max-width:100%; width:100%;}
+    .wordmark{font-size:30px;}
+  }
+
+  footer{
+    max-width:980px; margin:0 auto; padding:0 20px 30px;
+    font-size:12px; color:#5d6470; text-align:center;
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-in">
+      <div class="wordmark">Çizik</div>
+      <form class="mini-giris" id="mini-form">
+        <div class="mg-row">
+          <div>
+            <label for="m-email">E-posta</label>
+            <input id="m-email" type="email" autocomplete="email">
+          </div>
+          <div>
+            <label for="m-sifre">Şifre</label>
+            <input id="m-sifre" type="password" autocomplete="current-password">
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:flex-end;">
+            <button class="btn-gir" type="submit">Giriş Yap</button>
+            <div class="sifre-unuttum"><a href="#" id="sifre-unuttum">Şifreni mi unuttun?</a></div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="sol" id="sol-alan"><!-- AŞAMA 2: buraya şekiller/kişilik gelecek — bilinçli boş --></div>
+
+    <div class="sag">
+      <h1 id="kart-baslik">Hesap Aç</h1>
+      <div class="alt-yazi" id="kart-alt">Ücretsizdir ve her zaman ücretsiz kalacaktır.</div>
+
+      <div class="hata-genel" id="genel-hata"></div>
+
+      <!-- KAYIT MODU -->
+      <form class="kart" id="kayit-form" novalidate>
+        <div class="isim-satir">
+          <div class="alan">
+            <label for="ad">Ad</label>
+            <input id="ad" type="text" maxlength="40" autocomplete="given-name" placeholder="Ahmet">
+          </div>
+          <div class="alan">
+            <label for="soyad">Soyad</label>
+            <input id="soyad" type="text" maxlength="40" autocomplete="family-name" placeholder="Bıçak">
+          </div>
+        </div>
+
+        <div class="alan ikonlu" id="alan-email">
+          <label for="email">Cep telefonu veya e-posta</label>
+          <input id="email" type="text" inputmode="email" maxlength="80" autocomplete="email" placeholder="Cep telefonu veya e-posta adresi">
+          <button type="button" class="x" id="email-x" title="Temizle" aria-label="Temizle">✕</button>
+          <div class="hata">Geçerli bir e-posta veya telefon yaz.</div>
+        </div>
+
+        <div class="alan" id="alan-sifre">
+          <label for="sifre">Yeni şifre</label>
+          <input id="sifre" type="password" maxlength="72" autocomplete="new-password" placeholder="Yeni şifre">
+          <div class="hata">Şifre en az 6 karakter olmalı.</div>
+        </div>
+
+        <div class="cinsiyet">
+          <label><input type="radio" name="cins" value="kadin"> Kadın</label>
+          <label><input type="radio" name="cins" value="erkek"> Erkek</label>
+        </div>
+
+        <div class="sozlesme">
+          <b>Hesap Aç</b>'a tıklayarak Koşullarımızı kabul etmiş olursun ve Şartlar, Gizlilik İlkesi ve Çerez Kullanımı dahil Veri Politikamızı okuduğunu onaylarsın.
+        </div>
+
+        <button class="btn-kayit" type="submit">Hesap Aç</button>
+        <div class="uyari-ok" id="uyari-ok">Hesap oluşturuldu ✓ yönlendiriliyorsun…</div>
+      </form>
+
+      <!-- GİRİŞ MODU -->
+      <form class="kart" id="giris-form" style="display:none;" novalidate>
+        <div class="alan" id="alan-gkimlik">
+          <label for="g-kimlik">E-posta veya telefon</label>
+          <input id="g-kimlik" type="text" inputmode="email" maxlength="80" autocomplete="email" placeholder="Kayıtlı e-postan veya telefonun">
+          <div class="hata">Bu alan gerekli.</div>
+        </div>
+        <div class="alan" id="alan-gsifre">
+          <label for="g-sifre">Şifre</label>
+          <input id="g-sifre" type="password" maxlength="72" autocomplete="current-password" placeholder="Şifren">
+          <div class="hata">Bu alan gerekli.</div>
+        </div>
+        <button class="btn-kayit" type="submit">Giriş Yap</button>
+        <div class="uyari-ok" id="giris-ok">Giriş başarılı ✓ yönlendiriliyorsun…</div>
+      </form>
+
+      <div class="giris-link" id="mod-link">
+        Hesabın var mı? <a id="link-giris">Giriş yap</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>Çizik · Yap. Çiz. Paylaş.</footer>
+
+<script>
+"use strict";
+/* ---- Çizik · giriş/kayıt ekranı (aşama 2, parça 1) ----
+   Demo hesap: localStorage (tek hesap). Supabase gelince gerçek auth'a geçecek.
+   Akış: Hesap Aç → hesap kaydedilir → index.html'e yönlendirme.
+         Giriş yap (kart veya üst şerit) → şifre kontrolü → index.html. */
+
+var K_HESAP = "cizik_hesap_demo_v1";
+
+function oku(){ try{ return JSON.parse(localStorage.getItem(K_HESAP)); }catch(e){ return null; } }
+function yazHesap(a){ localStorage.setItem(K_HESAP, JSON.stringify(a)); }
+
+function gecerliKimlik(v){
+  v = (v || "").trim();
+  if(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return true;
+  var r = v.replace(/\s/g,"");
+  if(/^(\+90)?0?5\d{9}$/.test(r)) return true;
+  return false;
+}
+
+function genelHata(msg){
+  var el = document.getElementById("genel-hata");
+  if(!msg){ el.style.display = "none"; return; }
+  el.textContent = msg; el.style.display = "block";
+}
+
+/* ---- mod geçişi: kayıt <-> giriş ---- */
+var modKayit = true;
+function mod(kayit){
+  modKayit = kayit;
+  document.getElementById("kayit-form").style.display = kayit ? "block" : "none";
+  document.getElementById("giris-form").style.display = kayit ? "none" : "block";
+  document.getElementById("kart-baslik").textContent = kayit ? "Hesap Aç" : "Tekrar hoş geldin";
+  document.getElementById("kart-alt").textContent = kayit
+    ? "Ücretsizdir ve her zaman ücretsiz kalacaktır."
+    : "Listene devam etmek için giriş yap.";
+  document.getElementById("mod-link").innerHTML = kayit
+    ? 'Hesabın var mı? <a id="link-giris">Giriş yap</a>'
+    : 'Hesabın yok mu? <a id="link-giris">Hesap Aç</a>';
+  document.getElementById("link-giris").addEventListener("click", function(){ mod(!modKayit); });
+  genelHata(null);
+}
+document.getElementById("link-giris").addEventListener("click", function(){ mod(!modKayit); });
+
+/* ---- ✕ temizle düğmesi ---- */
+(function(){
+  var alan = document.getElementById("alan-email"),
+      inp  = document.getElementById("email"),
+      x    = document.getElementById("email-x");
+  inp.addEventListener("input", function(){
+    alan.classList.toggle("dolu", inp.value.length > 0);
+    alan.classList.remove("hatali");
+    genelHata(null);
+  });
+  x.addEventListener("click", function(){
+    inp.value = ""; inp.focus();
+    alan.classList.remove("dolu"); alan.classList.remove("hatali");
+  });
+})();
+
+/* ---- ortak giriş mantığı ---- */
+function girisYap(kimlik, sifre){
+  kimlik = (kimlik || "").trim().toLowerCase();
+  if(!kimlik || !sifre) return { ok:false, msg:"E-posta ve şifre gerekli." };
+  var a = oku();
+  if(!a) return { ok:false, msg:"Bu cihazda kayıtlı hesap yok — önce Hesap Aç." };
+  if((a.kimlik || "").toLowerCase() !== kimlik) return { ok:false, msg:"Böyle bir hesap yok (demo tek hesap destekler)." };
+  if(a.sifre && a.sifre !== sifre) return { ok:false, msg:"Şifre yanlış." };
+  if(!a.sifre){ a.sifre = sifre; yazHesap(a); } /* eski demo kaydına şifre ata */
+  return { ok:true };
+}
+
+function uygula(){ try{ location.href = "index.html"; }catch(e){} }
+
+/* ---- KAYIT ---- */
+document.getElementById("kayit-form").addEventListener("submit", function(e){
+  e.preventDefault();
+  genelHata(null);
+  var ad    = document.getElementById("ad").value.trim();
+  var soyad = document.getElementById("soyad").value.trim();
+  var kimlik= document.getElementById("email").value.trim();
+  var sifre = document.getElementById("sifre").value;
+  var cins  = (document.querySelector('input[name="cins"]:checked') || {}).value || "";
+
+  var kimlikOk = gecerliKimlik(kimlik);
+  document.getElementById("alan-email").classList.toggle("hatali", !kimlikOk);
+  var sifreOk = sifre.length >= 6;
+  document.getElementById("alan-sifre").classList.toggle("hatali", !sifreOk);
+  if(!kimlikOk || !sifreOk) return;
+
+  var mevcut = oku();
+  if(mevcut){
+    if((mevcut.kimlik || "").toLowerCase() === kimlik.toLowerCase()){
+      genelHata("Bu e-posta zaten kayıtlı — üstteki Giriş Yap'ı ya da alttaki 'Giriş yap' bağlantısını kullan.");
+    } else {
+      genelHata("Bu cihazda kayıtlı bir hesap var (demo tek hesap destekler). Giriş yapmayı dene.");
+    }
+    return;
+  }
+
+  yazHesap({ ad:ad, soyad:soyad, kimlik:kimlik, sifre:sifre, cinsiyet:cins, olusturma:new Date().toISOString() });
+  document.getElementById("uyari-ok").style.display = "block";
+  setTimeout(uygula, 700);
+});
+
+/* ---- GİRİŞ (kart) ---- */
+document.getElementById("giris-form").addEventListener("submit", function(e){
+  e.preventDefault();
+  genelHata(null);
+  var r = girisYap(
+    document.getElementById("g-kimlik").value,
+    document.getElementById("g-sifre").value
+  );
+  if(!r.ok){ genelHata(r.msg); return; }
+  document.getElementById("giris-ok").style.display = "block";
+  setTimeout(uygula, 700);
+});
+
+/* ---- GİRİŞ (üst şerit, masaüstü) ---- */
+document.getElementById("mini-form").addEventListener("submit", function(e){
+  e.preventDefault();
+  var r = girisYap(
+    document.getElementById("m-email").value,
+    document.getElementById("m-sifre").value
+  );
+  if(!r.ok){ genelHata(r.msg); return; }
+  uygula();
+});
+
+document.getElementById("sifre-unuttum").addEventListener("click", function(e){
+  e.preventDefault();
+  alert("Şifre sıfırlama, hesap sistemi (Supabase) bağlandığında gelecek. Şimdilik giriş yapmayı dene.");
+});
+</script>
+</body>
+</html>
