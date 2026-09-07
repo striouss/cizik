@@ -36,6 +36,13 @@
     text-decoration:line-through; text-decoration-thickness:2.5px;
     text-decoration-color:rgba(230,234,239,.7);
   }
+  .topnav{display:none; gap:6px;}
+  .nav-btn{
+    background:none; border:none; color:var(--muted); font-family:inherit; font-size:14px;
+    padding:8px 14px; border-radius:8px; cursor:pointer; transition:all .15s;
+  }
+  .nav-btn:hover{color:var(--text); background:rgba(91,147,214,.08);}
+  .nav-btn.aktif{color:var(--pri-light); background:rgba(15,77,149,.22); font-weight:700;}
   .avatar-mini{
     width:34px; height:34px; border-radius:50%; background:var(--pri);
     display:flex; align-items:center; justify-content:center;
@@ -211,6 +218,26 @@
   .cikis-btn:hover{background:rgba(229,83,60,.1);}
   .a-not{font-size:11.5px; color:#5d6470; line-height:1.5; margin-top:8px;}
 
+  /* ===== MASAÜSTÜ: yatay geniş düzen (>=820px) ===== */
+  @media (min-width:820px){
+    .app{max-width:1080px; padding-bottom:0;}
+    .topnav{display:flex;}
+    .tabbar{display:none;}
+    .screen{padding:34px 24px 60px;}
+    .selam{font-size:30px;}
+    .main-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+    .main-grid .secim{margin-bottom:0; padding:28px 24px;}
+    .secim .ikon{font-size:32px;}
+    .mini-istat{max-width:560px;}
+    .liste-grid{display:grid; grid-template-columns:400px 1fr; gap:26px; align-items:start;}
+    .liste-grid .ekleyici{position:sticky; top:76px; margin-bottom:0;}
+    #kesfet-liste{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+    #kesfet-liste .k-kart{margin-bottom:0;}
+    .profil-grid{display:grid; grid-template-columns:320px 1fr; gap:28px; align-items:start;}
+    .profil-grid .sol-p{padding-right:6px;}
+    #scr-ayarlar{display:block;}
+  }
+
   /* alt sekmeler */
   .tabbar{
     position:fixed; bottom:0; left:50%; transform:translateX(-50%);
@@ -232,6 +259,13 @@
 
   <div class="topbar">
     <div class="wordmark" id="logo">Çizik</div>
+    <div class="topnav">
+      <button class="nav-btn" data-scr="ana">Ana</button>
+      <button class="nav-btn" data-scr="liste">Listem</button>
+      <button class="nav-btn" data-scr="kesfet">Keşfet</button>
+      <button class="nav-btn" data-scr="profil">Profil</button>
+      <button class="nav-btn" data-scr="ayarlar">Ayarlar</button>
+    </div>
     <div class="avatar-mini" id="av-mini" title="Profil">?</div>
   </div>
 
@@ -240,15 +274,17 @@
     <div class="selam" id="selam">Merhaba</div>
     <div class="selam-alt">Ölmeden önce ne yapmak istiyorsun? Başla bakalım.</div>
 
-    <div class="secim" id="secim-liste">
-      <div class="ikon">✍️</div>
-      <h2>Listemi Yaz</h2>
-      <p>Ölmeden önce yapacakların — bir cümle yaz, yapınca çiz. Listen senden sonra da yaşar.</p>
-    </div>
-    <div class="secim" id="secim-kesfet">
-      <div class="ikon">🧭</div>
-      <h2>Keşfet</h2>
-      <p>Başkaları neler yapmış, neleri çizmiş? İlkelerden ilham al, takip et.</p>
+    <div class="main-grid">
+      <div class="secim" id="secim-liste">
+        <div class="ikon">✍️</div>
+        <h2>Listemi Yaz</h2>
+        <p>Ölmeden önce yapacakların — bir cümle yaz, yapınca çiz. Listen senden sonra da yaşar.</p>
+      </div>
+      <div class="secim" id="secim-kesfet">
+        <div class="ikon">🧭</div>
+        <h2>Keşfet</h2>
+        <p>Başkaları neler yapmış, neleri çizmiş? İlkelerden ilham al, takip et.</p>
+      </div>
     </div>
 
     <div class="mini-istat">
@@ -260,14 +296,18 @@
 
   <!-- LİSTEM -->
   <div class="screen" id="scr-liste">
-    <div class="ekleyici">
-      <input id="inp" type="text" maxlength="120" placeholder="Bir gün…" autocomplete="off">
-      <div class="cips" id="cips"></div>
-    </div>
-    <div class="liste-baslik" id="liste-baslik">— hayat listem —</div>
-    <div class="liste" id="liste"></div>
-    <div class="bos" id="bos">
-      Liste henüz boş.<br>Hayatına bir cümle ekle — <b>ne kadar cesur olursa olsun.</b>
+    <div class="liste-grid">
+      <div class="ekleyici">
+        <input id="inp" type="text" maxlength="120" placeholder="Bir gün…" autocomplete="off">
+        <div class="cips" id="cips"></div>
+      </div>
+      <div>
+        <div class="liste-baslik" id="liste-baslik">— hayat listem —</div>
+        <div class="liste" id="liste"></div>
+        <div class="bos" id="bos">
+          Liste henüz boş.<br>Hayatına bir cümle ekle — <b>ne kadar cesur olursa olsun.</b>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -279,61 +319,68 @@
 
   <!-- PROFİL -->
   <div class="screen" id="scr-profil">
-    <div class="p-ust">
-      <div class="p-av" id="p-av">?</div>
-      <div>
-        <div class="p-isim" id="p-isim">—</div>
-        <div class="p-kulci" id="p-kulci">@—</div>
+    <div class="profil-grid">
+      <div class="sol-p">
+        <div class="p-ust">
+          <div class="p-av" id="p-av">?</div>
+          <div>
+            <div class="p-isim" id="p-isim">—</div>
+            <div class="p-kulci" id="p-kulci">@—</div>
+          </div>
+        </div>
+        <div class="p-ist">
+          <div><b id="p-toplam">0</b><span>TOPLAM</span></div>
+          <div><b id="p-cizildi">0</b><span>ÇİZİLDİ</span></div>
+          <div><b id="p-takip">0</b><span>TAKİP</span></div>
+        </div>
       </div>
-    </div>
-    <div class="p-ist">
-      <div><b id="p-toplam">0</b><span>TOPLAM</span></div>
-      <div><b id="p-cizildi">0</b><span>ÇİZİLDİ</span></div>
-      <div><b id="p-takip">0</b><span>TAKİP</span></div>
-    </div>
 
-    <form class="form" id="profil-form">
-      <label for="pr-ad">Ad</label>
-      <input id="pr-ad" type="text" maxlength="40">
-      <label for="pr-soyad">Soyad</label>
-      <input id="pr-soyad" type="text" maxlength="40">
-      <label for="pr-handle">Kullanıcı adı</label>
-      <input id="pr-handle" type="text" maxlength="24" placeholder="@kullanıcı adın">
-      <label for="pr-bio">Hakkımda</label>
-      <textarea id="pr-bio" maxlength="160" placeholder="Kova listende en çok neyi yapmak istiyorsun?"></textarea>
-      <button class="btn" type="submit">Kaydet</button>
-      <div class="kayit-ok" id="profil-ok">Profil kaydedildi ✓</div>
-    </form>
+      <form class="form" id="profil-form">
+        <label for="pr-ad">Ad</label>
+        <input id="pr-ad" type="text" maxlength="40">
+        <label for="pr-soyad">Soyad</label>
+        <input id="pr-soyad" type="text" maxlength="40">
+        <label for="pr-handle">Kullanıcı adı</label>
+        <input id="pr-handle" type="text" maxlength="24" placeholder="@kullanıcı adın">
+        <label for="pr-bio">Hakkımda</label>
+        <textarea id="pr-bio" maxlength="160" placeholder="Kova listende en çok neyi yapmak istiyorsun?"></textarea>
+        <button class="btn" type="submit">Kaydet</button>
+        <div class="kayit-ok" id="profil-ok">Profil kaydedildi ✓</div>
+      </form>
+    </div>
   </div>
 
   <!-- AYARLAR -->
   <div class="screen" id="scr-ayarlar">
+    <div class="ayarlar-grid">
 
-    <div class="a-bolum">
-      <h3>Gizlilik</h3>
-      <div class="a-satir">
-        <div class="a-yazi"><b>Gizli hesap</b><span>Sadece onayladığın kişiler listeni görür.</span></div>
-        <label class="dugme"><input type="checkbox" id="ay-ozel"><i></i></label>
+      <div class="a-bolum">
+        <h3>Gizlilik</h3>
+        <div class="a-satir">
+          <div class="a-yazi"><b>Gizli hesap</b><span>Sadece onayladığın kişiler listeni görür.</span></div>
+          <label class="dugme"><input type="checkbox" id="ay-ozel"><i></i></label>
+        </div>
+        <div class="a-satir">
+          <div class="a-yazi"><b>Keşfet'te görün</b><span>Çiziklerin (çizilenler) diğerlerinde akışta görünür.</span></div>
+          <label class="dugme"><input type="checkbox" id="ay-kesfet"><i></i></label>
+        </div>
+        <div class="a-satir">
+          <div class="a-yazi"><b>Sadece çizilenler paylaşılsın</b><span>Henüz çizmediğin maddeler gizli kalır.</span></div>
+          <label class="dugme"><input type="checkbox" id="ay-cizilen"><i></i></label>
+        </div>
       </div>
-      <div class="a-satir">
-        <div class="a-yazi"><b>Keşfet'te görün</b><span>Çiziklerin (çizilenler) diğerlerinde akışta görünür.</span></div>
-        <label class="dugme"><input type="checkbox" id="ay-kesfet"><i></i></label>
-      </div>
-      <div class="a-satir">
-        <div class="a-yazi"><b>Sadece çizilenler paylaşılsın</b><span>Henüz çizmediğin maddeler gizli kalır.</span></div>
-        <label class="dugme"><input type="checkbox" id="ay-cizilen"><i></i></label>
-      </div>
-    </div>
 
-    <div class="a-bolum">
-      <h3>Güvenlik</h3>
-      <div class="sifre-alani">
-        <input id="sy-eski" type="password" placeholder="Mevcut şifre" autocomplete="current-password">
-        <input id="sy-yeni" type="password" placeholder="Yeni şifre (en az 6 karakter)" autocomplete="new-password">
-        <button class="btn" type="button" id="sy-btn">Şifreyi Değiştir</button>
-        <div class="kayit-ok" id="sy-ok">Şifre güncellendi ✓</div>
-        <div class="a-not">Şifre değişimi, hesap sistemi (Supabase) bağlandığında gerçekleşecek — şimdilik arayüz hazır.</div>
+      <div class="a-bolum">
+        <h3>Güvenlik</h3>
+        <div class="sifre-alani">
+          <input id="sy-eski" type="password" placeholder="Mevcut şifre" autocomplete="current-password">
+          <input id="sy-yeni" type="password" placeholder="Yeni şifre (en az 6 karakter)" autocomplete="new-password">
+          <button class="btn" type="button" id="sy-btn">Şifreyi Değiştir</button>
+          <div class="kayit-ok" id="sy-ok">Şifre güncellendi ✓</div>
+          <div class="a-not">Şifre değişimi, hesap sistemi (Supabase) bağlandığında gerçekleşecek — şimdilik arayüz hazır.</div>
+        </div>
       </div>
+
     </div>
 
     <div class="a-bolum">
@@ -412,7 +459,7 @@ function go(name){
   for(var i = 0; i < ekranlar.length; i++){
     ekranlar[i].classList.toggle("aktif", ekranlar[i].id === "scr-" + name);
   }
-  var sekmeler = document.querySelectorAll(".tabbar button");
+  var sekmeler = document.querySelectorAll(".tabbar button, .topnav .nav-btn");
   for(var j = 0; j < sekmeler.length; j++){
     sekmeler[j].classList.toggle("aktif", sekmeler[j].getAttribute("data-scr") === name);
   }
@@ -633,7 +680,7 @@ document.getElementById("secim-kesfet").addEventListener("click", function(){ go
 document.getElementById("av-mini").addEventListener("click", function(){ go("profil"); });
 document.getElementById("logo").addEventListener("click", function(){ go("ana"); });
 
-var tablar = document.querySelectorAll(".tabbar button");
+var tablar = document.querySelectorAll(".tabbar button, .topnav .nav-btn");
 for(var t = 0; t < tablar.length; t++){
   tablar[t].addEventListener("click", function(){ go(this.getAttribute("data-scr")); });
 }
