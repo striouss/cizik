@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F6EFE2">
+<title>Çizik — Yap. Çiz. Paylaş.</title>
+<style>
+  :root{
+    --paper:#F6EFE2; --ink:#2A2118; --caramel:#C19A6B; --caramel-dark:#9A7448;
+    --muted:#8A7B66; --card:#FFFDF8; --line:#E5D9C2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:'Panforte Serif', Georgia, 'Times New Roman', serif;
+    display:flex; flex-direction:column; align-items:center;
+    min-height:100vh; min-height:100dvh;
+  }
+  /* kağıt dokusu */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; opacity:.5; z-index:0;
+    background-image:radial-gradient(rgba(154,116,72,.06) 1px, transparent 1px);
+    background-size:22px 22px;
+  }
+  .wrap{width:100%; max-width:540px; padding:22px 18px 40px; position:relative; z-index:1;}
+
+  header{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:6px;}
+  .wordmark{font-size:34px; font-weight:700; letter-spacing:.5px;}
+  .wordmark i{
+    font-style:normal; color:var(--caramel);
+    text-decoration:line-through; text-decoration-thickness:3px;
+    text-decoration-color:var(--caramel-dark);
+  }
+  .slogan{font-size:13px; color:var(--muted); letter-spacing:.6px;}
+
+  .stats{
+    display:flex; gap:8px; margin:16px 0 18px;
+  }
+  .stat{
+    flex:1; background:var(--card); border:1px solid var(--line); border-radius:12px;
+    text-align:center; padding:10px 4px;
+  }
+  .stat b{display:block; font-size:22px; color:var(--caramel-dark);}
+  .stat span{font-size:10.5px; color:var(--muted); letter-spacing:1px;}
+
+  /* ekleme */
+  .adder{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:14px 14px 12px; margin-bottom:20px; box-shadow:0 4px 14px rgba(64,48,28,.07);
+  }
+  .adder input{
+    border:none; border-bottom:2px solid var(--caramel); background:transparent; outline:none;
+    font-family:inherit; font-size:18px; color:var(--ink); padding:4px 2px 8px; width:100%;
+  }
+  .adder input::placeholder{color:#C7B494;}
+  .chips{display:flex; flex-wrap:wrap; gap:7px; margin-top:11px;}
+  .chip{
+    background:var(--paper); border:1px solid var(--line); border-radius:999px; padding:6px 11px;
+    font-size:12.5px; font-family:inherit; color:#574a38; cursor:pointer; transition:all .15s;
+  }
+  .chip:hover{border-color:var(--caramel); background:#fff;}
+
+  /* liste */
+  .list-title{
+    font-size:11.5px; color:var(--muted); letter-spacing:1.4px; text-transform:uppercase;
+    text-align:center; margin-bottom:6px;
+  }
+  .list{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 14px;
+    box-shadow:0 4px 14px rgba(64,48,28,.07);}
+  .item{
+    display:flex; align-items:flex-start; gap:11px; padding:13px 2px;
+    border-bottom:1px dashed var(--line); cursor:pointer; font-size:16.5px; line-height:1.4;
+  }
+  .item:last-child{border-bottom:none;}
+  .circ{
+    flex:0 0 auto; width:19px; height:19px; border-radius:50%; border:2px solid var(--caramel);
+    margin-top:3px; background:transparent; position:relative; transition:background .2s;
+  }
+  .item.done .circ{background:var(--caramel);}
+  .item.done .circ::after{
+    content:"✓"; position:absolute; inset:0; color:#fff; font-size:11px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .txt-wrap{flex:1; min-width:0;}
+  .txt{position:relative; display:inline-block; max-width:100%; overflow-wrap:break-word;}
+  .item.done{color:#9a8a70;}
+  .txt svg{position:absolute; left:-2%; top:50%; width:104%; height:10px;
+    transform:rotate(-.8deg); pointer-events:none; overflow:visible; display:none;}
+  .item.done .txt svg{display:block;}
+  .txt path{
+    fill:none; stroke:var(--caramel-dark); stroke-width:3; stroke-linecap:round;
+    vector-effect:non-scaling-stroke; stroke-dasharray:130; stroke-dashoffset:0;
+  }
+  .txt.animate path{animation:draw .65s ease forwards;}
+  @keyframes draw{from{stroke-dashoffset:130;} to{stroke-dashoffset:0;}}
+  .when{display:block; font-size:11px; color:#B49F7E; margin-top:3px; min-height:14px;}
+  .item.done .when{color:var(--caramel-dark);}
+  .del{
+    flex:0 0 auto; background:none; border:none; color:#C7B494; cursor:pointer;
+    font-size:15px; font-family:inherit; padding:2px 5px; margin-top:2px; border-radius:6px;
+    opacity:.55; transition:all .15s;
+  }
+  .del:hover{opacity:1; color:#B4543E; background:#F2E8D6;}
+
+  .empty{
+    text-align:center; color:var(--muted); font-size:14.5px; line-height:1.6;
+    padding:26px 20px; display:none;
+  }
+  .empty b{color:var(--caramel-dark);}
+
+  footer{
+    margin-top:26px; text-align:center; font-size:12.5px; color:#B49F7E; line-height:1.7;
+  }
+  footer b{color:var(--caramel-dark);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="wordmark"><i>Çizik</i></div>
+    <div class="slogan">Yap. Çiz. Paylaş.</div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><b id="st-done">0</b><span>ÇİZİLDİ</span></div>
+    <div class="stat"><b id="st-left">0</b><span>KALDI</span></div>
+    <div class="stat"><b id="st-total">0</b><span>TOPLAM</span></div>
+  </div>
+
+  <div class="adder">
+    <input id="inp" type="text" maxlength="120" placeholder="Bir gün…" autocomplete="off">
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="list-title" id="list-title">— hayat listem —</div>
+  <div class="list" id="list"></div>
+  <div class="empty" id="empty">
+    Liste henüz boş.<br>Hayatına bir cümle ekle — <b>ne kadar cesur olursa olsun.</b>
+  </div>
+
+  <footer>
+    Listen senden sonra da yaşar.<br><b>Çizik</b> v1 · şimdilik bu cihazda saklanır
+  </footer>
+</div>
+
+<script>
+"use strict";
+/* ---- Çizik v1 — temel sürüm ----
+   Aşama 1: ekle / sil / çiz / geri al. Veriler localStorage'da.
+   Sonraki aşamalar (parça parça): Supabase hesaplar, foto+hikâye, akış, beğeni, PWA. */
+
+var KEY = "cizik_items_v1";
+var items = [];
+try { items = JSON.parse(localStorage.getItem(KEY) || "[]"); } catch(e){ items = []; }
+
+function save(){ localStorage.setItem(KEY, JSON.stringify(items)); }
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function esc(s){ var d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+function trDate(iso){
+  var d = new Date(iso);
+  var aylar = ["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"];
+  return d.getDate() + " " + aylar[d.getMonth()] + "'de çizildi";
+}
+
+/* karamelize çizik yolu — madde genişliğine göre yeniden çizilir */
+function strikePath(){
+  return 'M1,6 Q12,2.5 25,6 T50,5 T75,6.5 T99,4.5';
+}
+
+function render(){
+  var list = document.getElementById("list");
+  list.innerHTML = "";
+
+  // en yeni eklenen üstte, çizilenler kendi sırasında kalsın
+  var ordered = items.slice().sort(function(a,b){
+    if(!!a.done !== !!b.done) return a.done ? 1 : -1;
+    return (b.created||0) - (a.created||0);
+  });
+
+  ordered.forEach(function(it){
+    var el = document.createElement("div");
+    el.className = "item" + (it.done ? " done" : "");
+    el.setAttribute("data-id", it.id);
+    el.innerHTML =
+      '<span class="circ"></span>' +
+      '<span class="txt-wrap"><span class="txt">' + esc(it.text) +
+        '<svg viewBox="0 0 100 10" preserveAspectRatio="none"><path d="' + strikePath() + '"/></svg>' +
+        '</span><span class="when">' + (it.done ? esc(it.doneLabel || trDate(it.doneAt)) : "") + '</span></span>' +
+      '<button class="del" title="Sil">✕</button>';
+
+    el.querySelector(".del").addEventListener("click", function(ev){
+      ev.stopPropagation();
+      items = items.filter(function(x){ return x.id !== it.id; });
+      save(); render();
+    });
+
+    el.addEventListener("click", function(){
+      var t = items.find(function(x){ return x.id === it.id; });
+      if(!t) return;
+      if(t.done){
+        t.done = false; t.doneAt = null; t.doneLabel = null;
+      } else {
+        t.done = true; t.doneAt = new Date().toISOString();
+        t.doneLabel = "şimdi çizildi ✨";
+      }
+      save(); render();
+      if(t.done){
+        // taze çizik animasyonu
+        var fresh = document.querySelector('[data-id="' + t.id + '"] .txt');
+        if(fresh){ fresh.classList.add("animate"); }
+      }
+    });
+
+    list.appendChild(el);
+  });
+
+  var done = items.filter(function(x){ return x.done; }).length;
+  document.getElementById("st-done").textContent = done;
+  document.getElementById("st-left").textContent = items.length - done;
+  document.getElementById("st-total").textContent = items.length;
+  document.getElementById("empty").style.display = items.length ? "none" : "block";
+  document.getElementById("list").style.display = items.length ? "block" : none0();
+  document.getElementById("list-title").style.display = items.length ? "block" : "none";
+}
+function none0(){ return "none"; }
+
+function addItem(text){
+  text = (text || "").trim();
+  if(!text) return;
+  items.push({ id: uid(), text: text, created: Date.now(), done: false, doneAt: null, doneLabel: null });
+  save(); render();
+}
+
+var inp = document.getElementById("inp");
+inp.addEventListener("keydown", function(e){
+  if(e.key === "Enter"){ addItem(inp.value); inp.value = ""; }
+});
+
+/* boş oda ilacı: fikir çipleri */
+var FIKIRLER = [
+  "🪂 Yamaç paraşütü yapmak", "📖 Bir kitap yazmak", "⛰️ Kaçkar Dağları'nda kamp",
+  "🌌 Aurora borealis görmek", "🚂 Transsibirya treniyle yolculuk", "🏝️ Tek başına seyahat",
+  "🎻 Bir enstrüman öğrenmek", "✉️ Eline mektup yazmak", "🌅 Deniz kızılcağında yüzmek",
+  "🏕️ Yıldızların altında uyumak"
+];
+var chipsEl = document.getElementById("chips");
+FIKIRLER.forEach(function(f){
+  var b = document.createElement("button");
+  b.className = "chip"; b.textContent = f;
+  b.addEventListener("click", function(){ addItem(f); b.style.display = "none"; });
+  chipsEl.appendChild(b);
+});
+
+render();
+</script>
+</body>
+</html>
