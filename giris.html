@@ -96,6 +96,12 @@
     background:none; border:none; color:var(--muted); font-size:15px; cursor:pointer; display:none;
   }
   .ikonlu.dolu .x{display:block;}
+  .goz{
+    position:absolute; right:12px; top:50%; transform:translateY(-50%);
+    background:none; border:none; cursor:pointer; font-size:15px; color:var(--muted);
+    padding:2px; line-height:1;
+  }
+  .goz:hover{color:var(--text);}
   .hata{font-size:12.5px; color:var(--err); margin-top:5px; display:none;}
   .alan.hatali input{border-color:var(--err);}
   .alan.hatali .hata{display:block;}
@@ -224,6 +230,7 @@
         <div class="alan" id="alan-gsifre">
           <label for="g-sifre">Şifre</label>
           <input id="g-sifre" type="password" maxlength="72" autocomplete="current-password" placeholder="Şifren">
+          <button type="button" class="goz" id="goz" title="Şifreyi göster/gizle" aria-label="Şifreyi göster">👁</button>
           <div class="hata">Bu alan gerekli.</div>
         </div>
         <button class="btn-kayit" type="submit">Giriş Yap</button>
@@ -263,6 +270,19 @@ function genelHata(msg){
   if(!msg){ el.style.display = "none"; return; }
   el.textContent = msg; el.style.display = "block";
 }
+
+/* ---- şifre göster/gizle ---- */
+(function(){
+  var b = document.getElementById("goz"), inp = document.getElementById("g-sifre");
+  if(!b) return;
+  b.addEventListener("click", function(){
+    var acik = inp.type === "password";
+    inp.type = acik ? "text" : "password";
+    b.textContent = acik ? "🙈" : "👁";
+    b.setAttribute("aria-label", acik ? "Şifreyi gizle" : "Şifreyi göster");
+    inp.focus();
+  });
+})();
 
 /* ---- mod geçişi: kayıt <-> giriş ---- */
 var modKayit = true;

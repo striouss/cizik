@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#181721">
 <title>Çizik</title>
+<meta name="description" content="Çizik — ölmeden önce yapacakların listesi. Yaz, yapınca çiz, paylaş.">
+<meta property="og:title" content="Çizik — Yap. Çiz. Paylaş.">
+<meta property="og:description" content="Ölmeden önce ne yapmak istiyorsun? Listeni yaz, yaptıkça çiz.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://striouss.github.io/cizik/">
+<meta property="og:image" content="https://striouss.github.io/cizik/kapak.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230F4D95'/%3E%3Ctext x='16' y='23' font-size='18' font-weight='bold' font-family='Arial' fill='%23E6EAEF' text-anchor='middle'%3E%C3%87%3C/text%3E%3Cline x1='6' y1='16' x2='26' y2='13' stroke='%23E6EAEF' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
   /* ---- Çizik yeni marka: bg #181721 · öncelik #0F4D95 · metin #E6EAEF · Arial ---- */
@@ -91,6 +98,12 @@
   }
   .cips button:hover{border-color:var(--pri); color:var(--text);}
   .liste-baslik{font-size:11px; color:var(--muted); letter-spacing:1.4px; text-transform:uppercase; margin-bottom:6px;}
+  .liste-ust{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+  .secenekler{display:flex; gap:7px;}
+  .secenekler select{
+    background:var(--field); color:var(--text); border:1px solid var(--field-line);
+    border-radius:8px; padding:7px 9px; font-family:inherit; font-size:12.5px; outline:none; cursor:pointer;
+  }
   .liste{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:4px 14px;}
   .madde{
     display:flex; align-items:flex-start; gap:11px; padding:13px 2px;
@@ -235,6 +248,7 @@
     #kesfet-liste .k-kart{margin-bottom:0;}
     .profil-grid{display:grid; grid-template-columns:320px 1fr; gap:28px; align-items:start;}
     .profil-grid .sol-p{padding-right:6px;}
+    .ayarlar-grid{display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start;}
     #scr-ayarlar{display:block;}
   }
 
@@ -252,6 +266,10 @@
   }
   .tabbar button i{display:block; font-style:normal; font-size:17px; margin-bottom:3px;}
   .tabbar button.aktif{color:var(--pri-light); border-top-color:var(--pri);}
+
+  /* alt içerik/footera nefes */
+  .app-tabani{padding:0 16px 90px; text-align:center; font-size:11.5px; color:#5d6470; line-height:1.7;}
+  .app-tabani b{color:var(--pri-light);}
 </style>
 </head>
 <body>
@@ -297,15 +315,53 @@
   <!-- LİSTEM -->
   <div class="screen" id="scr-liste">
     <div class="liste-grid">
-      <div class="ekleyici">
-        <input id="inp" type="text" maxlength="120" placeholder="Bir gün…" autocomplete="off">
-        <div class="cips" id="cips"></div>
-      </div>
       <div>
-        <div class="liste-baslik" id="liste-baslik">— hayat listem —</div>
+        <div class="ekleyici">
+          <input id="inp" type="text" maxlength="120" placeholder="Bir gün…" autocomplete="off">
+          <div class="cips" id="cips"></div>
+        </div>
+
+        <div class="ekleyici" style="margin-top:14px;">
+          <div class="a-yazi" style="margin-bottom:10px;"><b>Yedekle / Geri Yükle</b><span style="display:block;">Listeni dosyaya al, başka cihaza taşı.</span></div>
+          <button class="btn btn-ikinci" type="button" id="yedek-btn" style="margin-bottom:8px;">⬇ Yedeği indir (JSON)</button>
+          <label class="btn btn-ikinci" style="text-align:center; cursor:pointer;">
+            ⬆ Yedek yükle
+            <input type="file" id="geri-dosya" accept=".json,application/json" style="display:none;">
+          </label>
+          <div class="kayit-ok" id="yedek-ok"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="liste-ust">
+          <div class="liste-baslik" id="liste-baslik">— hayat listem —</div>
+          <div class="secenekler">
+            <select id="filtre" aria-label="Filtre">
+              <option value="hepsi">Hepsi</option>
+              <option value="kaldi">Yapılacaklar</option>
+              <option value="done">Çizilenler</option>
+            </select>
+            <select id="sirala" aria-label="Sırala">
+              <option value="yeni">En yeni</option>
+              <option value="eski">En eski</option>
+              <option value="az">A → Z</option>
+              <option value="za">Z → A</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="p-ist" style="margin-bottom:12px;">
+          <div><b id="l-toplam">0</b><span>TOPLAM</span></div>
+          <div><b id="l-cizildi">0</b><span>ÇİZİLDİ</span></div>
+          <div><b id="l-kaldi">0</b><span>KALDI</span></div>
+        </div>
+
         <div class="liste" id="liste"></div>
         <div class="bos" id="bos">
           Liste henüz boş.<br>Hayatına bir cümle ekle — <b>ne kadar cesur olursa olsun.</b>
+        </div>
+        <div class="bos" id="bos-filtre">
+          Bu filtrede madde yok.
         </div>
       </div>
     </div>
@@ -399,6 +455,10 @@
     <button data-scr="profil"><i>👤</i>Profil</button>
     <button data-scr="ayarlar"><i>⚙️</i>Ayarlar</button>
   </div>
+
+  <div class="app-tabani">
+    <b>Çizik</b> · Yap. Çiz. Paylaş. · listen bu cihazda saklanır · v2
+  </div>
 </div>
 
 <script>
@@ -480,15 +540,40 @@ function renderAna(){
 }
 
 /* ---- LİSTEM ---- */
+var filtre = "hepsi", sirala = "yeni";
+var listeFiltre = document.getElementById("filtre");
+var listeSirala = document.getElementById("sirala");
+if(listeFiltre) listeFiltre.addEventListener("change", function(){ filtre = this.value; renderListe(); });
+if(listeSirala) listeSirala.addEventListener("change", function(){ sirala = this.value; renderListe(); });
+
+function goster(msg, elId, renk){
+  var ok = document.getElementById(elId);
+  ok.textContent = msg;
+  ok.style.color = renk || "var(--ok)";
+  ok.style.display = "block";
+  setTimeout(function(){ ok.style.display = "none"; }, 2600);
+}
+
 function renderListe(){
   var liste = document.getElementById("liste");
   liste.innerHTML = "";
-  var ordered = items.slice().sort(function(a,b){
-    if(!!a.done !== !!b.done) return a.done ? 1 : -1;
-    return (b.created || 0) - (a.created || 0);
+
+  var gorunen = items.filter(function(x){
+    if(filtre === "kaldi") return !x.done;
+    if(filtre === "done") return !!x.done;
+    return true;
   });
 
-  ordered.forEach(function(it){
+  gorunen.sort(function(a,b){
+    if(sirala === "az")  return (a.text||"").localeCompare(b.text||"", "tr");
+    if(sirala === "za")  return (b.text||"").localeCompare(a.text||"", "tr");
+    if(sirala === "eski") return (a.created||0) - (b.created||0);
+    return (b.created||0) - (a.created||0); /* yeni — çizilenler sona yine sediment olsun */
+  });
+  /* çizilenler her sıralamada altta dursun (okunaklılık) */
+  gorunen.sort(function(a,b){ if(!!a.done !== !!b.done) return a.done ? 1 : -1; return 0; });
+
+  gorunen.forEach(function(it){
     var el = document.createElement("div");
     el.className = "madde" + (it.done ? " done" : "");
     el.setAttribute("data-id", it.id);
@@ -521,13 +606,25 @@ function renderListe(){
     liste.appendChild(el);
   });
 
+  var done = items.filter(function(x){ return x.done; }).length;
+  document.getElementById("l-toplam").textContent = items.length;
+  document.getElementById("l-cizildi").textContent = done;
+  document.getElementById("l-kaldi").textContent = items.length - done;
+
   var bosEl = document.getElementById("bos");
+  var bosFiltre = document.getElementById("bos-filtre");
   var listeEl = document.getElementById("liste");
   var baslik = document.getElementById("liste-baslik");
+  var ustBar = document.querySelector(".liste-ust");
   if(items.length === 0){
-    listeEl.style.display = "none"; bosEl.style.display = "block"; baslik.style.display = "none";
+    ustBar.style.display = "none";
+    listeEl.style.display = "none"; bosEl.style.display = "block"; bosFiltre.style.display = "none"; baslik.style.display = "none";
+  } else if(gorunen.length === 0){
+    ustBar.style.display = "flex";
+    listeEl.style.display = "none"; bosEl.style.display = "none"; bosFiltre.style.display = "block"; baslik.style.display = "block";
   } else {
-    listeEl.style.display = "block"; bosEl.style.display = "none"; baslik.style.display = "block";
+    ustBar.style.display = "flex";
+    listeEl.style.display = "block"; bosEl.style.display = "none"; bosFiltre.style.display = "none"; baslik.style.display = "block";
   }
 }
 
@@ -703,6 +800,49 @@ window.__cizik = {
   go: go,
   durum: function(){ return { aktif: aktif, items: items.length, hesap: hesap, ayarlar: ayarlar, begeni: begeni, takip: takip }; }
 };
+
+/* ---- YEDEK AL / GERİ YÜKLE ---- */
+document.getElementById("yedek-btn").addEventListener("click", function(){
+  var veri = {
+    uygulama: "cizik", surum: 2,
+    tarihi: new Date().toISOString(),
+    items: items, profil: profil, ayarlar: ayarlar
+  };
+  var blob = new Blob([JSON.stringify(veri, null, 2)], { type: "application/json" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "cizik-yedek-" + new Date().toISOString().slice(0,10) + ".json";
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 800);
+  goster("Yedek indirildi ✓", "yedek-ok");
+});
+
+document.getElementById("geri-dosya").addEventListener("change", function(){
+  var f = this.files && this.files[0];
+  this.value = "";
+  if(!f) return;
+  var r = new FileReader();
+  r.onload = function(){
+    try{
+      var veri = JSON.parse(r.result);
+      if(!veri || veri.uygulama !== "cizik" || !Array.isArray(veri.items)) throw 0;
+      var mevcut = {};
+      items.forEach(function(x){ mevcut[x.id] = true; });
+      var eklendi = 0;
+      veri.items.forEach(function(x){
+        if(x && x.id && x.text && !mevcut[x.id]){ items.push(x); eklendi++; }
+      });
+      if(veri.profil && typeof veri.profil === "object"){ profil = Object.assign({}, profil, veri.profil); yaz(K_PRO, profil); }
+      if(veri.ayarlar && typeof veri.ayarlar === "object"){ ayarlar = Object.assign({}, ayarlar, veri.ayarlar); yaz(K_AY, ayarlar); }
+      yaz(K_ITEMS, items);
+      renderListe(); renderAna(); renderProfil();
+      goster(eklendi + " madde geri yüklendi ✓", "yedek-ok");
+    }catch(e){
+      goster("Dosya okunamadı — bu bir Çizik yedeği mi?", "yedek-ok", "var(--err)");
+    }
+  };
+  r.readAsText(f);
+});
 
 renderAna();
 renderProfil();
