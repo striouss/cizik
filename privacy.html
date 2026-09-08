@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OzcanKlip Uploader — Gizlilik Politikası</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;max-width:760px;margin:0 auto;padding:32px 20px;line-height:1.65;color:#1a1a1a;background:#fff}
+  h1{font-size:1.6em} h2{font-size:1.15em;margin-top:1.8em}
+  .muted{color:#666;font-size:.92em}
+  ul{padding-left:22px}
+</style>
+</head>
+<body>
+<h1>OzcanKlip Uploader — Gizlilik Politikası</h1>
+<p class="muted">Son güncelleme: 8 Eylül 2026</p>
+
+<p>OzcanKlip Uploader, Yiğit Kıvrak tarafından yalnızca kendi YouTube kanalı ("Özcan Shorts") için geliştirilmiş ve kullanılan kişisel, ücretsiz bir video yükleme aracıdır. Bu araç herkese açık bir servis değildir; yalnızca geliştiricisinin kendi bilgisayarında çalışır.</p>
+
+<h2>Toplanan Veriler</h2>
+<ul>
+  <li><b>YouTube OAuth belirteci:</b> Aracın kanala video yükleyebilmesi için kanal sahibinin (yani geliştiricinin kendisinin) onayıyla alınan erişim/yenileme belirteçleri, yalnızca geliştiricinin kendi bilgisayarında yerel olarak saklanır. Hiçbir sunucuya gönderilmez veya üçüncü taraflarla paylaşılmaz.</li>
+  <li><b>Video meta verileri:</b> Yüklenecek videoların başlık, açıklama ve etiket bilgileri yalnızca YouTube Data API'ye aktarılır.</li>
+</ul>
+
+<h2>Verilerin Kullanımı</h2>
+<p>Aracın API kullanımı yalnızca şu kapsamla sınırlıdır: <b>videos.insert</b> (kendi kanalına video yükleme). Aracın hiçbir bileşeni kullanıcı verisi toplamaz, izleme/takip yapmaz, reklam veya analiz hizmeti kullanmaz, veri satmaz.</p>
+
+<h2>Üçüncü Taraflar</h2>
+<p>Tek harici servis, yüklemenin kendisi için Google YouTube Data API v3'tür. Google'ın veri kullanımı, Google Gizlilik Politikası'na tabidir.</p>
+
+<h2>Veri Saklama ve Silme</h2>
+<p>OAuth belirteçleri cihaz üzerinde <code>~/.yt-uploader/token.json</code> dosyasında tutulur; dosya silindiğinde erişim tamamen ortadan kalkar. Kanal sahibi dilediği an Google hesabı ayarlarından (Güvenlik → Üçüncü taraf erişimleri) uygulamanın erişimini iptal edebilir.</p>
+
+<h2>İletişim</h2>
+<p>Sorular için: yigitkivraak@gmail.com</p>
+
+<h2>English Summary</h2>
+<p class="muted">OzcanKlip Uploader is a personal, non-public tool used solely by its developer to upload videos to his own YouTube channel. OAuth tokens are stored locally on the developer's own machine and never shared. The tool collects no user data, uses no analytics or ads, and calls only the YouTube Data API (videos.insert) for uploads to the developer's own channel. Access can be revoked anytime via Google account settings.</p>
+</body>
+</html>
